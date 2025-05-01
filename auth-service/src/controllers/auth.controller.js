@@ -10,7 +10,7 @@ export const register = async (req, res) => {
   session.startTransaction();
 
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     // Avoid registering the existing user
     const existingUser = await User.findOne({ email });
@@ -28,13 +28,18 @@ export const register = async (req, res) => {
     const user = await User.create({
       email,
       password: hashedPassword,
+      role,
     });
     await user.save({ session });
 
     // Jwt token creation
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    });
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+      }
+    );
 
     // Session end
     await session.commitTransaction();
@@ -89,7 +94,7 @@ export const login = async (req, res) => {
     }
 
     // Jwt token creation
-    const payload = { userId: existingUser._id };
+    const payload = { userId: existingUser._id, role: existingUser.role };
     const accessToken = generateAccessToken(payload);
     const refreshToken = generateRefreshToken(payload);
     existingUser.refreshToken = refreshToken;
@@ -139,7 +144,10 @@ export const refreshAccessToken = async (req, res) => {
       });
     }
 
-    const newAccessToken = generateAccessToken({ userId: user._id });
+    const newAccessToken = generateAccessToken({
+      userId: user._id,
+      role: user.role,
+    });
     res.json({
       accessToken: newAccessToken,
     });
