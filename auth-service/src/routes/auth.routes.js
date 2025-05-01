@@ -6,6 +6,7 @@ import {
   register,
 } from "../controllers/auth.controller.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
+import { roleMiddleware } from "../middlewares/role.middleware.js";
 
 const authRouter = Router();
 
@@ -14,9 +15,19 @@ authRouter.post("/login", login);
 authRouter.get("/refresh-token", refreshAccessToken);
 authRouter.post("/logout", logout);
 
-// ONLY FOR TESTING
+//                    ONLY FOR TESTING
+
 // authRouter.get("/profile", authMiddleware, (req, res) => {
 //   res.json({ message: "Token is valid!", user: req.user });
 // });
+
+// authRouter.get(
+//   "/admin-only",
+//   authMiddleware,
+//   roleMiddleware(["user"]),
+//   (req, res) => {
+//     res.json({ message: "Welcome, user!" });
+//   }
+// );
 
 export default authRouter;
