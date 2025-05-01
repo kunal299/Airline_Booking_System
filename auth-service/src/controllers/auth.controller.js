@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
 
 export const register = async (req, res) => {
   //Session begin
@@ -18,17 +19,17 @@ export const register = async (req, res) => {
         success: false,
         message: "User already exists",
       });
+      return;
     }
 
     // Password hashing
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create(
-      {
-        email,
-        password: hashedPassword,
-      },
-      { session }
-    );
+
+    const user = await User.create({
+      email,
+      password: hashedPassword,
+    });
+    await user.save({ session });
 
     // Jwt token creation
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
@@ -75,6 +76,7 @@ export const login = async (req, res) => {
         success: false,
         message: "Invalid email",
       });
+      return;
     }
 
     // Checking if the passwords are matching or not
@@ -87,13 +89,11 @@ export const login = async (req, res) => {
     }
 
     // Jwt token creation
-    const token = jwt.sign(
-      { userId: existingUser._id },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: process.env.JWT_EXPIRES_IN,
-      }
-    );
+    const payload = { userId: existingUser._id };
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
+    existingUser.refreshToken = refreshToken;
+    await existingUser.save();
 
     // Session end
     await session.commitTransaction();
@@ -104,7 +104,8 @@ export const login = async (req, res) => {
       success: true,
       message: "Login successful",
       data: {
-        token,
+        accessToken,
+        refreshToken,
         user: existingUser,
       },
     });
@@ -115,6 +116,36 @@ export const login = async (req, res) => {
 
     res.status(500).json({
       error: e.message,
+    });
+  }
+};
+
+export const refreshAccessToken = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    res.status(400).json({
+      message: "Refresh token not found",
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user || user.refreshToken != refreshToken) {
+      return res.status(400).json({
+        message: "Invalid refresh token",
+      });
+    }
+
+    const newAccessToken = generateAccessToken({ userId: user._id });
+    res.json({
+      accessToken: newAccessToken,
+    });
+  } catch (error) {
+    res.status(403).json({
+      message: error.message,
     });
   }
 };
