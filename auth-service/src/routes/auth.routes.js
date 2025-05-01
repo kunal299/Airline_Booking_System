@@ -1,9 +1,15 @@
 import express, { Router } from "express";
 import { login, register } from "../controllers/auth.controller.js";
+import authMiddleware from "../middlewares/auth.middleware.js";
 
 const authRouter = Router();
 
-authRouter.use("/register", register);
-authRouter.use("/login", login);
+authRouter.post("/register", register);
+authRouter.post("/login", login);
+
+// ONLY FOR TESTING
+// authRouter.get("/profile", authMiddleware, (req, res) => {
+//   res.json({ message: "Token is valid!", user: req.user });
+// });
 
 export default authRouter;
