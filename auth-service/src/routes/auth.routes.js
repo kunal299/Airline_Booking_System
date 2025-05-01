@@ -6,8 +6,10 @@ const authRouter = Router();
 
 authRouter.post("/register", register);
 authRouter.post("/login", login);
-authRouter.get("/profile", authMiddleware, (req, res) => {
-  res.json({ message: "Token is valid!", user: req.user });
-});
+
+// ONLY FOR TESTING
+// authRouter.get("/profile", authMiddleware, (req, res) => {
+//   res.json({ message: "Token is valid!", user: req.user });
+// });
 
 export default authRouter;
