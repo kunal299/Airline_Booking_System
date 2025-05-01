@@ -149,3 +149,31 @@ export const refreshAccessToken = async (req, res) => {
     });
   }
 };
+
+export const logout = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(400).json({
+      message: "Refresh token not found",
+    });
+  }
+
+  try {
+    const user = await User.findOne({ refreshToken });
+    if (!user) {
+      return res.status(204).send();
+    }
+
+    user.refreshToken = null;
+    await user.save();
+
+    res.status(200).json({
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
