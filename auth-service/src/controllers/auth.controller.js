@@ -32,15 +32,6 @@ export const register = async (req, res) => {
     });
     await user.save({ session });
 
-    // Jwt token creation
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: process.env.JWT_EXPIRES_IN,
-      }
-    );
-
     // Session end
     await session.commitTransaction();
     session.endSession();
@@ -50,7 +41,6 @@ export const register = async (req, res) => {
       success: true,
       message: "User registered",
       data: {
-        token,
         user: user,
       },
     });

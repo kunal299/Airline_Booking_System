@@ -9,6 +9,7 @@ export const getAllFlights = async (req, res) => {
         flights,
       },
     });
+    console.log("Flights: ", flights);
   } catch (e) {
     res.status(500).json({
       message: "Failed to get flights",
@@ -20,7 +21,11 @@ export const getAllFlights = async (req, res) => {
 export const createFlight = async (req, res) => {
   try {
     const newFlight = await Flight.create(req.body);
-    res.status(201).json(newFlight);
+    res.status(201).json({
+      message: "New flight created successfully",
+      newFlight,
+    });
+    console.log(newFlight);
   } catch (e) {
     console.log(e.message);
     res.status(500).json({

@@ -3,11 +3,10 @@ import {
   createFlight,
   getAllFlights,
 } from "../controllers/flight.controller.js";
-import { authMiddleware } from "../middlewares/flight.middleware.js";
 
 const flightRouter = express.Router();
 
-flightRouter.get("/", authMiddleware, getAllFlights);
-flightRouter.post("/", authMiddleware, createFlight);
+flightRouter.get("/", getAllFlights);
+flightRouter.post("/", createFlight);
 
 export default flightRouter;
