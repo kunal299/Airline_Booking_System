@@ -21,7 +21,7 @@ export const flightServiceProxyHandler = async (req, res) => {
   try {
     const response = await axios({
       method,
-      url: `${process.env.FLIGHT_SERVICE_URL}/api/v1/flights`,
+      url: `${process.env.FLIGHT_SERVICE_URL}${req.originalUrl}`,
       data: req.body,
       headers: {
         Authorization: `Bearer ${req.headers.authorization?.split(" ")[1]}`,

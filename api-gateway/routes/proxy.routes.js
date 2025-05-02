@@ -23,6 +23,27 @@ proxyRouter.post(
   flightServiceProxyHandler
 );
 
+proxyRouter.get(
+  "/flights/:id",
+  authMiddleware,
+  roleMiddleware(["user", "admin"]),
+  flightServiceProxyHandler
+);
+
+proxyRouter.put(
+  "/flights/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  flightServiceProxyHandler
+);
+
+proxyRouter.delete(
+  "/flights/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  flightServiceProxyHandler
+);
+
 proxyRouter.use("/auth", authServiceProxyHandler);
 
 export default proxyRouter;
