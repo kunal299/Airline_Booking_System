@@ -19,6 +19,7 @@ export const authServiceProxyHandler = async (req, res) => {
 export const flightServiceProxyHandler = async (req, res) => {
   const method = req.method.toLowerCase();
   try {
+    console.log(`${process.env.FLIGHT_SERVICE_URL}${req.originalUrl}`);
     const response = await axios({
       method,
       url: `${process.env.FLIGHT_SERVICE_URL}${req.originalUrl}`,
