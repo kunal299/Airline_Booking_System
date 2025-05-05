@@ -16,10 +16,31 @@ proxyRouter.get(
   flightServiceProxyHandler
 );
 
+proxyRouter.patch(
+  "/flights/increment-seats/:flightId",
+  authMiddleware,
+  roleMiddleware(["user", "admin"]),
+  flightServiceProxyHandler
+);
+
+proxyRouter.patch(
+  "/flights/decrement-seats/:flightId",
+  authMiddleware,
+  roleMiddleware(["user", "admin"]),
+  flightServiceProxyHandler
+);
+
 proxyRouter.post(
   "/flights",
   authMiddleware,
   roleMiddleware(["admin"]),
+  flightServiceProxyHandler
+);
+
+proxyRouter.get(
+  "/flights/search",
+  authMiddleware,
+  roleMiddleware(["user", "admin"]),
   flightServiceProxyHandler
 );
 
