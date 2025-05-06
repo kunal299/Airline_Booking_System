@@ -192,7 +192,7 @@ export const decrementSeats = async (req, res) => {
 
     flight.availableSeats -= count;
     await flight.save();
-    res.json({
+    res.status(200).json({
       message: "Flight seats updated successfully",
     });
   } catch (err) {
