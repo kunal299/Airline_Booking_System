@@ -5,6 +5,7 @@ import {
   authServiceProxyHandler,
   bookingServiceProxyHandler,
   flightServiceProxyHandler,
+  notificationServiceProxyHandler,
 } from "../controllers/proxy.controller.js";
 
 const proxyRouter = express.Router();
@@ -79,6 +80,14 @@ proxyRouter.post(
   authMiddleware,
   roleMiddleware(["admin"]),
   bookingServiceProxyHandler
+);
+
+// Notification Service
+proxyRouter.post(
+  "/notify",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  notificationServiceProxyHandler
 );
 
 // Auth Service

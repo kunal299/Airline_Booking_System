@@ -57,3 +57,24 @@ export const bookingServiceProxyHandler = async (req, res) => {
     });
   }
 };
+
+export const notificationServiceProxyHandler = async (req, res) => {
+  const method = req.method.toLowerCase();
+  try {
+    console.log(`${process.env.NOTIFICATION_SERVICE_URL}${req.originalUrl}`);
+    const response = await axios({
+      method,
+      url: `${process.env.NOTIFICATION_SERVICE_URL}${req.originalUrl}`,
+      data: req.body,
+      headers: {
+        Authorization: `Bearer ${req.headers.authorization?.split(" ")[1]}`,
+      },
+    });
+    console.log(response.data);
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch the notification data",
+    });
+  }
+};
