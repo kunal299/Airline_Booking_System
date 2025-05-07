@@ -2,16 +2,16 @@ import axios from "axios";
 import Booking from "../models/booking.model.js";
 
 export const createBooking = async (req, res) => {
-  const { flightId, seatsBooked } = req.body;
+  const { flightId, seatsBooked, email } = req.body;
 
-  if (!flightId || !seatsBooked) {
+  if (!flightId || !seatsBooked || !email) {
     return res.status(400).json({
-      message: "Flight ID and seats are required",
+      message: "Flight ID, seats and email are required",
     });
   }
 
   try {
-    //Reserve seats
+    // 1. Reserve seats
     await axios.patch(
       `http://localhost:4002/api/v1/flights/decrement-seats/${flightId}`,
       {
@@ -19,10 +19,20 @@ export const createBooking = async (req, res) => {
       }
     );
 
+    // 2. Creating booking
     const booking = await Booking.create({
       user: req.headers["x-user-id"],
       flight: flightId,
       seatsBooked,
+    });
+
+    // 3. Send mail
+    await axios.post("http://localhost:4004/api/v1/notify", {
+      email,
+      subject: "Regarding your recent booking",
+      flightId,
+      seatsBooked,
+      action: "booking",
     });
 
     res.status(201).json({
@@ -49,6 +59,13 @@ export const createBooking = async (req, res) => {
 
 export const cancelBooking = async (req, res) => {
   const { bookingId } = req.params;
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({
+      message: "Email is required",
+    });
+  }
 
   try {
     const booking = await Booking.findById(bookingId);
@@ -75,6 +92,15 @@ export const cancelBooking = async (req, res) => {
     // 2. Update booking status
     booking.status = "cancelled";
     await booking.save();
+
+    // 3. Send mail
+    await axios.post("http://localhost:4004/api/v1/notify", {
+      email,
+      subject: "Regarding your recent booking",
+      flightId: booking.flight,
+      seatsBooked: booking.seatsBooked,
+      action: "cancel",
+    });
 
     res.status(200).json({
       message: "Booking cancelled and seats restored",
