@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [auth, flight, booking, notification, api-gateway]
+        service: [auth-service, flight-service, booking-service, notification-service, api-gateway]
 
     steps:
       - name: Checkout code
