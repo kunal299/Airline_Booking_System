@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [auth, flight, booking, notification, api-gateway]
+        service: [auth-service, flight-service, booking-service, notification-service, api-gateway]
 
     steps:
       - name: Checkout code
@@ -23,5 +23,5 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:dev ./{{ matrix.service }}
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:dev ./${{ matrix.service }}
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:dev
