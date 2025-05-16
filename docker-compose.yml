@@ -1,0 +1,61 @@
+version: "3"
+
+services:
+  apigateway: 
+    build: ./api-gateway
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./api-gateway:/app
+      - /app/node_modules
+    environment:
+      - PORT=4000
+      - AUTH_SERVICE_URL=http://auth:4001
+      - FLIGHT_SERVICE_URL=http://flight:4002
+      - BOOKING_SERVICE_URL=http://booking:4003
+      - NOTIFICATION_SERVICE_URL=http://notification:4004
+    depends_on:
+      - auth
+      - flight
+      - booking
+      - notification
+
+  auth:
+    build: ./auth-service
+    ports:
+      - "4001:4001"
+    volumes:
+      - ./auth-service:/app
+      - /app/node_modules
+    environment:
+      - PORT=4001
+
+  flight:
+    build: ./flight-service
+    ports:
+      - "4002:4002"
+    volumes:
+      - ./flight-service:/app
+      - /app/node_modules
+    environment:
+      - PORT=4002
+
+  booking:
+    build: ./booking-service
+    ports:
+      - "4003:4003"
+    volumes:
+      - ./booking-service:/app
+      - /app/node_modules
+    environment:
+      - PORT=4003
+
+  notification:
+    build: ./notification-service
+    ports:
+      - "4004:4004"
+    volumes:
+      - ./notification-service:/app
+      - /app/node_modules
+    environment:
+      - PORT=4004
